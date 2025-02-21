@@ -23,10 +23,142 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--light-bg);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f0f0f0;
+}
+
+.sales-sheet {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header {
+    background: #003366;
+    color: white;
+    padding: 20px;
+    border-radius: 8px 8px 0 0;
+    margin: -20px -20px 20px -20px;
+    text-align: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.agent-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.agent-section label {
+    font-weight: bold;
+    color: #003366;
+}
+
+.agent-section select, 
+.agent-section input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.entry-form {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-row input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-row input[type="text"] {
+    flex: 2;
+}
+
+.form-row input[type="number"] {
+    flex: 1;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th {
+    background: #4f81bd;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.add-button {
+    background: #4f81bd;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.add-button:hover {
+    background: #3a6491;
+}
+
+.sales-display, .daily-totals {
+    margin-top: 30px;
+}
+
+h2 {
+    color: #003366;
+    margin-bottom: 15px;
+}
+
+#salesList tr:nth-child(even),
+#totalsList tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .form-row input {
+        width: 100%;
+    }
+    
+    table {
+        display: block;
+        overflow-x: auto;
+    }
 }
 
 /* Navbar Styles */
@@ -603,6 +735,10 @@ footer {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
     .hero-content h1 {
         font-size: 2.5rem;
     }
@@ -681,4 +817,909 @@ footer {
 
 .category-card:nth-child(4) {
     animation-delay: 0.6s;
+}
+
+/* Welcome Trailer Section */
+.welcome-trailer {
+    position: relative;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--white);
+}
+
+.trailer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://source.unsplash.com/random/1920x1080/?office') center/cover;
+    opacity: 0.2;
+}
+
+.trailer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    padding: 2rem;
+}
+
+.animate-text {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.animate-text:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.animate-text:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+.supervisor-welcome {
+    margin: 3rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.supervisor-image {
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--accent-color);
+    animation: pulse 2s infinite;
+}
+
+.supervisor-image i {
+    font-size: 4rem;
+    color: var(--accent-color);
+}
+
+.welcome-message h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.welcome-message p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.trailer-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin: 3rem 0;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item i {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.stat-item .counter {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+    display: block;
+}
+
+.stat-item p {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.explore-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background: var(--accent-color);
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+}
+
+.explore-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.explore-btn i {
+    transition: transform 0.3s ease;
+}
+
+.explore-btn:hover i {
+    transform: translateX(5px);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 20px rgba(241, 196, 15, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(241, 196, 15, 0);
+    }
+}
+
+/* Responsive Design for Welcome Trailer */
+@media (max-width: 768px) {
+    .supervisor-welcome {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .welcome-message h2 {
+        font-size: 2rem;
+    }
+
+    .trailer-stats {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .stat-item .counter {
+        font-size: 2rem;
+    }
+}
+
+/* Excel-style Table */
+.excel-table {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.excel-header {
+    background: #217346; /* MS Excel green */
+    color: white;
+    font-weight: bold;
+    display: grid;
+    grid-template-columns: 60px 120px 200px 200px 120px 100px;
+    gap: 1px;
+    border-bottom: 2px solid #185632;
+}
+
+.excel-cell {
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: white;
+}
+
+.header-cell {
+    background: #217346;
+    border-color: #185632;
+    text-align: center;
+    font-size: 14px;
+    padding: 10px;
+}
+
+.excel-body {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.excel-row {
+    display: grid;
+    grid-template-columns: 60px 120px 200px 200px 120px 100px;
+    gap: 1px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.excel-row:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.excel-row:hover {
+    background-color: #e8f0fe;
+}
+
+.excel-footer {
+    background: #f0f0f0;
+    border-top: 2px solid #ccc;
+    padding: 10px;
+}
+
+.excel-summary {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.summary-cell {
+    background: #217346;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+}
+
+/* Filter Section Styling */
+.filter-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.filter-section label {
+    font-weight: bold;
+    color: #217346;
+}
+
+.filter-section input[type="month"] {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.filter-section button {
+    background: #217346;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.filter-section button:hover {
+    background: #185632;
+}
+
+/* Status Indicators */
+.status-success {
+    color: #217346;
+    font-weight: bold;
+}
+
+.amount-cell {
+    text-align: right;
+    font-family: 'Consolas', monospace;
+}
+
+.serial-cell {
+    text-align: center;
+    color: #666;
+}
+
+/* Weekly Sales Report Styles */
+.weekly-report-header {
+    background: #003366;
+    color: white;
+    padding: 15px;
+    border-radius: 4px 4px 0 0;
+    text-align: center;
+}
+
+.weekly-report-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #ffeb3b;
+}
+
+.report-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.weekly-table {
+    overflow-x: auto;
+    background: white;
+    border: 2px solid #003366;
+    border-radius: 0 0 4px 4px;
+}
+
+#salesTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+#salesTable th,
+#salesTable td {
+    border: 1px solid #4f81bd;
+    padding: 8px;
+    text-align: center;
+}
+
+#salesTable thead {
+    background: #4f81bd;
+    color: white;
+}
+
+.date-row th {
+    background: #003366;
+}
+
+.call-type-row th {
+    background: #4f81bd;
+}
+
+#salesTable tbody tr {
+    background: #dce6f1;
+}
+
+#salesTable tbody tr:nth-child(even) {
+    background: #c5d9f1;
+}
+
+#salesTable tbody tr:hover {
+    background: #b8cce4;
+}
+
+#salesTable tfoot {
+    background: #003366;
+    color: white;
+    font-weight: bold;
+}
+
+.filter-section {
+    background: #4f81bd;
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.filter-section input[type="week"] {
+    padding: 5px;
+    border: 1px solid #003366;
+    border-radius: 4px;
+}
+
+.filter-section button {
+    background: #003366;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.filter-section button:hover {
+    background: #002244;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .weekly-table {
+        overflow-x: auto;
+    }
+    
+    #salesTable {
+        min-width: 1000px;
+    }
+}
+
+/* Sales Report Styles */
+.sales-report {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    border: 1px solid #003366;
+}
+
+.report-header {
+    background: #003366;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.report-title {
+    font-size: 24px;
+    margin: 0;
+    color: white;
+}
+
+#salesTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+#salesTable td {
+    border: 1px solid #4f81bd;
+    padding: 10px;
+    text-align: center;
+}
+
+.date-header td {
+    background: #003366;
+    color: white;
+    font-weight: bold;
+}
+
+.person-name {
+    background: #4f81bd !important;
+    color: white !important;
+    font-weight: bold;
+    text-align: left !important;
+    padding-left: 20px !important;
+}
+
+#salesTable tr:not(.date-header) td:not(.person-name) {
+    background: #dce6f1;
+}
+
+#salesTable tr:nth-child(even):not(.date-header) td:not(.person-name) {
+    background: #c5d9f1;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: var(--white);
+    width: 90%;
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 2rem;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .sales-report {
+        margin: 10px;
+        font-size: 14px;
+    }
+    
+    .website-url {
+        font-size: 24px;
+    }
+    
+    .report-title {
+        font-size: 20px;
+    }
+    
+    .contact-info {
+        font-size: 11px;
+    }
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.main-buttons {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.action-button {
+    background: #003366;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.action-button:hover {
+    background: #004488;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 1000px;
+    position: relative;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.close-btn {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.sales-report {
+    width: 100%;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    border: 1px solid #003366;
+}
+
+.report-header {
+    background: #003366;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.report-title {
+    font-size: 24px;
+    margin: 0;
+    color: white;
+}
+
+#salesTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+#salesTable td {
+    border: 1px solid #4f81bd;
+    padding: 10px;
+    text-align: center;
+}
+
+.date-header td {
+    background: #003366;
+    color: white;
+    font-weight: bold;
+}
+
+.person-name {
+    background: #4f81bd !important;
+    color: white !important;
+    font-weight: bold;
+    text-align: left !important;
+    padding-left: 20px !important;
+}
+
+.sales-input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#salesTable tr:not(.date-header) td:not(.person-name) {
+    background: #dce6f1;
+}
+
+#salesTable tr:nth-child(even):not(.date-header) td:not(.person-name) {
+    background: #c5d9f1;
+}
+
+.sales-report {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid #003366;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.report-header {
+    background: #003366;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.report-header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+#salesTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+#salesTable td {
+    border: 1px solid #4f81bd;
+    padding: 10px;
+    text-align: center;
+}
+
+.date-header td {
+    background: #003366;
+    color: white;
+    font-weight: bold;
+}
+
+.person-name {
+    background: #4f81bd !important;
+    color: white !important;
+    font-weight: bold;
+    text-align: left !important;
+    padding-left: 20px !important;
+}
+
+.sales-input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#salesTable tr:not(.date-header) td:not(.person-name) {
+    background: #dce6f1;
+}
+
+#salesTable tr:nth-child(even):not(.date-header) td:not(.person-name) {
+    background: #c5d9f1;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .info-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #salesTable {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+.call-log-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background: #f0f0f0;
+    margin-bottom: 20px;
+}
+
+.logo-container {
+    width: 100px;
+    height: 100px;
+    background: #ffeb3b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+}
+
+.header-info {
+    flex-grow: 1;
+}
+
+.operator-image {
+    width: 150px;
+    height: 150px;
+    background: #ffeb3b;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.call-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.call-log-table th,
+.call-log-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.call-log-table th {
+    background-color: #f5f5f5;
+}
+
+.date-cell {
+    width: 100px;
+    background: #ffeb3b;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.sales-sheet {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.sheet-header {
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: inline-block;
+    width: 120px;
+    font-weight: bold;
+}
+
+.input-group input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.sales-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.sales-table th,
+.sales-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.sales-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+.summary-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.reflection-section {
+    margin: 20px 0;
+}
+
+.reflection-section textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.signature-section {
+    margin-top: 30px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+.instructions {
+    margin-top: 30px;
+    padding: 15px;
+    background: #f5f5f5;
+    border-left: 4px solid #333;
+}
+
+.instructions h3 {
+    margin-bottom: 10px;
+}
+
+.instructions ul {
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin-bottom: 5px;
+}
+
+.button-group {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+.btn-danger {
+    background-color: #f44336;
+}
+
+.btn-danger:hover {
+    background-color: #da190b;
 }

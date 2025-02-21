@@ -96,10 +96,10 @@
         <h2>Digital Marketplace</h2>
         <div class="marketplace-categories">
             <div class="category-card">
-                <img src="https://source.unsplash.com/random/800x600/?technology" alt="Technology">
-                <h3>Technology</h3>
-                <p>Latest gadgets and tech solutions</p>
-                <a href="#" class="btn-secondary">Explore</a>
+                <img src="https://source.unsplash.com/random/800x600/?msoffice" alt="MS Office">
+                <h3>MS Office Sales</h3>
+                <p>Daily sales tracking for agents</p>
+                <a href="#" class="btn-secondary" onclick="showSalesForm()">Enter Sales</a>
             </div>
             <div class="category-card">
                 <img src="https://source.unsplash.com/random/800x600/?business" alt="Business">
@@ -118,6 +118,81 @@
                 <h3>Consulting</h3>
                 <p>Expert consultation services</p>
                 <a href="#" class="btn-secondary">Explore</a>
+            </div>
+        </div>
+
+        <!-- Sales Form Modal -->
+        <div id="salesFormModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>MS Office Sales Entry</h2>
+                <form id="salesForm">
+                    <div class="form-group">
+                        <label for="agentName">एजेंट का नाम / Agent Name:</label>
+                        <input type="text" id="agentName" name="agentName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="callType">कॉल का प्रकार / Call Type:</label>
+                        <select id="callType" name="callType" required>
+                            <option value="">चुनें / Select</option>
+                            <option value="New Call">New Call</option>
+                            <option value="Follow Up">Follow Up Call</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salesDate">दिनांक / Date:</label>
+                        <input type="date" id="salesDate" name="salesDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salesAmount">बिक्री राशि / Sales Amount (₹):</label>
+                        <input type="number" id="salesAmount" name="salesAmount" min="0" step="0.01" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary">जमा करें / Submit</button>
+                </form>
+
+                <div class="sales-report">
+                    <div class="report-header">
+                        <h1 class="report-title">Daily Sales Report</h1>
+                    </div>
+                    <table id="salesTable">
+                        <tr class="date-header">
+                            <td>Agent Name</td>
+                            <td>21-02-2025</td>
+                            <td>22-02-2025</td>
+                            <td>23-02-2025</td>
+                            <td>24-02-2025</td>
+                            <td>25-02-2025</td>
+                        </tr>
+                        <tr>
+                            <td class="person-name">Wasi</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td class="person-name">Hamza</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td class="person-name">Ali</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </section>
@@ -253,6 +328,72 @@
             </div>
         </div>
     </section>
+    <div class="container">
+        <div class="main-buttons">
+            <button class="action-button" onclick="openSalesModal()">Sales Entry</button>
+        </div>
+
+        <!-- Sales Entry Modal -->
+        <div id="salesModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeSalesModal()">&times;</span>
+                <div class="sales-report">
+                    <div class="report-header">
+                        <h1 class="report-title">Daily Sales Entry</h1>
+                    </div>
+                    <table class="sales-table">
+                        <thead>
+                            <tr>
+                                <th>Customer Name</th>
+                                <th>Product/Service</th>
+                                <th>Quantity</th>
+                                <th>Price (Per Unit)</th>
+                                <th>Total Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <!-- Sales rows will be added here dynamically -->
+                        </tbody>
+                    </table>
+                    <div class="button-group">
+                        <button id="addRow" class="btn">Add New Sale</button>
+                        <button id="clearAll" class="btn btn-danger">Clear All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="call-log-header">
+        <div class="logo-container">
+            <div class="logo">YOUR LOGO HERE</div>
+        </div>
+        <div class="header-info">
+            <h2>COMPANY NAME</h2>
+            <p>123 Street Name, ZIP City</p>
+            <p>(000) 1234 56789</p>
+            <p>Week Number: <span id="weekNumber"></span></p>
+            <p id="dateRange"></p>
+        </div>
+        <div class="operator-image">
+            <!-- Operator image or icon will be here -->
+        </div>
+    </div>
+
+    <table class="call-log-table">
+        <thead>
+            <tr>
+                <th>DAY/DATE</th>
+                <th>TIME</th>
+                <th>PERSON CALLED</th>
+                <th>COMPANY NAME</th>
+                <th>ACTION TO BE TAKEN / NOTES</th>
+            </tr>
+        </thead>
+        <tbody id="callLogBody">
+            <!-- Table rows will be dynamically added here -->
+        </tbody>
+    </table>
 </main>
 
 <footer>

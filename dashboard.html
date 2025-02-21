@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPO Command Center - Mr. Aitzaz</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-container {
+            background: #1a1a1a;
+            min-height: 100vh;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            padding: 3rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .supervisor-title {
+            font-size: 3.5rem;
+            margin: 0;
+            position: relative;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .communication-motto {
+            font-size: 1.8rem;
+            margin-top: 1rem;
+            color: #ecf0f1;
+            position: relative;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .theme-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .theme-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .theme-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .theme-description {
+            color: #bdc3c7;
+            line-height: 1.6;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
+            }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(-20px) translateX(10px);
+                opacity: 0.8;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <section class="header-section">
+            <div class="header-overlay"></div>
+            <div class="particles" id="particles"></div>
+            <h1 class="supervisor-title">BPO Supervisor - Mr. Aitzaz</h1>
+            <p class="communication-motto">We Believe in Communication</p>
+        </section>
+
+        <div class="theme-grid">
+            <div class="theme-card" onclick="window.location.href='sales-entry.html'">
+                <i class="fas fa-chart-line theme-icon"></i>
+                <h3 class="theme-title">Sales Entry</h3>
+                <p class="theme-description">Enter and track your daily sales data with our easy-to-use form.</p>
+            </div>
+            <div class="theme-card">
+                <i class="fas fa-headset theme-icon"></i>
+                <h2 class="theme-title">Customer Service Excellence</h2>
+                <p class="theme-description">Delivering exceptional support through professional communication and dedicated service.</p>
+            </div>
+            <div class="theme-card">
+                <i class="fas fa-users theme-icon"></i>
+                <h2 class="theme-title">Team Leadership</h2>
+                <p class="theme-description">Guiding and empowering our team to achieve outstanding results through effective collaboration.</p>
+            </div>
+            <div class="theme-card">
+                <i class="fas fa-chart-line theme-icon"></i>
+                <h2 class="theme-title">Performance Metrics</h2>
+                <p class="theme-description">Tracking and optimizing key performance indicators for continuous improvement.</p>
+            </div>
+            <div class="theme-card">
+                <i class="fas fa-graduation-cap theme-icon"></i>
+                <h2 class="theme-title">Training & Development</h2>
+                <p class="theme-description">Investing in our team's growth through comprehensive training programs.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        for(let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            particlesContainer.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
