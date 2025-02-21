@@ -340,93 +340,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set today's date by default
     document.getElementById('date').valueAsDate = new Date();
     
-    // Add first row by default
-    addNewRow();
-    
-    // Add event listeners
-    document.getElementById('addRow').addEventListener('click', addNewRow);
-    document.getElementById('saveSheet').addEventListener('click', saveSheet);
-    document.getElementById('newSheet').addEventListener('click', newSheet);
-});
-
-function addNewRow() {
-    const tbody = document.getElementById('salesTableBody');
-    const row = document.createElement('tr');
-    
-    row.innerHTML = `
-        <td><input type="text" class="customer-name" placeholder="Customer name"></td>
-        <td><input type="text" class="product" placeholder="Product/Service"></td>
-        <td><input type="number" class="quantity" value="1" min="1"></td>
-        <td><input type="number" class="price" value="0" min="0"></td>
-        <td class="row-total">0</td>
-        <td><button class="delete-button" onclick="deleteRow(this)">Delete</button></td>
-    `;
-    
-    tbody.appendChild(row);
-    
-    // Add event listeners for calculation
-    const inputs = row.querySelectorAll('input');
-    inputs.forEach(input => {
-        input.addEventListener('input', calculateRowTotal);
-    });
-}
-
-function calculateRowTotal(event) {
-    const row = event.closest('tr');
-    const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-    const price = parseFloat(row.querySelector('.price').value) || 0;
-    const total = quantity * price;
-    
-    row.querySelector('.row-total').textContent = total.toFixed(2);
-    calculateTotalSales();
-}
-
-function calculateTotalSales() {
-    const totals = Array.from(document.querySelectorAll('.row-total'))
-        .map(cell => parseFloat(cell.textContent) || 0);
-    const grandTotal = totals.reduce((sum, val) => sum + val, 0);
-    document.getElementById('totalSales').textContent = grandTotal.toFixed(2);
-}
-
-function deleteRow(button) {
-    button.closest('tr').remove();
-    calculateTotalSales();
-}
-
-function saveSheet() {
-    const data = {
-        date: document.getElementById('date').value,
-        agentName: document.getElementById('agentName').value,
-        sales: Array.from(document.getElementById('salesTableBody').rows).map(row => ({
-            customerName: row.querySelector('.customer-name').value,
-            product: row.querySelector('.product').value,
-            quantity: row.querySelector('.quantity').value,
-            price: row.querySelector('.price').value,
-            total: row.querySelector('.row-total').textContent
-        })),
-        totalSales: document.getElementById('totalSales').textContent,
-        notes: document.getElementById('notes').value
-    };
-    
-    localStorage.setItem('salesSheet_' + data.date + '_' + data.agentName, JSON.stringify(data));
-    alert('Sales sheet saved successfully!');
-}
-
-function newSheet() {
-    if (confirm('Start a new sheet? Current data will be cleared.')) {
-        document.getElementById('agentName').value = '';
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('notes').value = '';
-        document.getElementById('salesTableBody').innerHTML = '';
-        document.getElementById('totalSales').textContent = '0';
-        addNewRow();
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Set today's date by default
-    document.getElementById('saleDate').valueAsDate = new Date();
-    
     // Load saved sales
     loadSavedSales();
     updateTotals();
@@ -1209,3 +1122,454 @@ function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSheet();
+});
+
+function initializeSheet() {
+    // Set default values
+    document.getElementById('entryDate').valueAsDate = new Date();
+    document.getElementById('monthSelector').value = formatYearMonth(new Date());
+    
+    // Add event listeners
+    document.getElementById('addEntry').addEventListener('click', addEntry);
+    document.getElementById('monthSelector').addEventListener('change', loadMonthData);
+    document.getElementById('newSheet').addEventListener('click', createNewSheet);
+    document.getElementById('saveSheet').addEventListener('click', saveSheet);
+    document.getElementById('exportExcel').addEventListener('click', exportToExcel);
+    
+    // Load initial data
+    loadMonthData();
+}
+
+function addEntry() {
+    const date = document.getElementById('entryDate').value;
+    const agentName = document.getElementById('agentName').value.trim();
+    const salesCount = parseInt(document.getElementById('salesCount').value) || 0;
+    const target = parseInt(document.getElementById('target').value) || 0;
+    const remarks = document.getElementById('remarks').value.trim();
+    
+    if (!validateEntry(date, agentName)) return;
+    
+    const entry = {
+        id: Date.now(),
+        date,
+        agentName,
+        salesCount,
+        target,
+        achievement: calculateAchievement(salesCount, target),
+        remarks,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Save entry
+    const month = getMonthKey(date);
+    let monthData = getMonthData(month);
+    monthData.entries.push(entry);
+    saveMonthData(month, monthData);
+    
+    // Reset form and reload
+    resetForm();
+    loadMonthData();
+}
+
+function validateEntry(date, agentName) {
+    if (!date) {
+        alert('Please select a date');
+        return false;
+    }
+    if (!agentName) {
+        alert('Please enter agent name');
+        return false;
+    }
+    return true;
+}
+
+function calculateAchievement(sales, target) {
+    if (!target) return 0;
+    return Math.round((sales / target) * 100);
+}
+
+function loadMonthData() {
+    const month = document.getElementById('monthSelector').value;
+    const monthData = getMonthData(month);
+    
+    const gridBody = document.getElementById('gridBody');
+    gridBody.innerHTML = '';
+    
+    monthData.entries.sort((a, b) => new Date(b.date) - new Date(a.date))
+        .forEach(entry => {
+            const row = document.createElement('div');
+            row.className = 'grid-row';
+            row.innerHTML = `
+                <div class="cell">${formatDate(entry.date)}</div>
+                <div class="cell">${entry.agentName}</div>
+                <div class="cell">${entry.salesCount}</div>
+                <div class="cell">${entry.target}</div>
+                <div class="cell">${entry.achievement}%</div>
+                <div class="cell">${entry.remarks}</div>
+                <div class="cell">
+                    <button class="action-btn edit-btn" onclick="editEntry(${entry.id})">Edit</button>
+                    <button class="action-btn delete-btn" onclick="deleteEntry(${entry.id})">Delete</button>
+                </div>
+            `;
+            gridBody.appendChild(row);
+        });
+    
+    updateSummary(monthData);
+}
+
+function updateSummary(monthData) {
+    const entries = monthData.entries;
+    const totalSales = entries.reduce((sum, entry) => sum + entry.salesCount, 0);
+    const avgSales = entries.length ? Math.round(totalSales / entries.length) : 0;
+    const totalTarget = entries.reduce((sum, entry) => sum + entry.target, 0);
+    const achievement = totalTarget ? Math.round((totalSales / totalTarget) * 100) : 0;
+    
+    let bestWeek = '-';
+    if (entries.length) {
+        const best = entries.reduce((max, entry) => 
+            entry.salesCount > max.salesCount ? entry : max, entries[0]);
+        bestWeek = `${formatDate(best.date)} (${best.salesCount})`;
+    }
+    
+    document.getElementById('totalSales').textContent = totalSales;
+    document.getElementById('avgSales').textContent = avgSales;
+    document.getElementById('achievementRate').textContent = `${achievement}%`;
+    document.getElementById('bestWeek').textContent = bestWeek;
+}
+
+function editEntry(id) {
+    const month = document.getElementById('monthSelector').value;
+    const monthData = getMonthData(month);
+    const entry = monthData.entries.find(e => e.id === id);
+    
+    if (entry) {
+        document.getElementById('entryDate').value = entry.date;
+        document.getElementById('agentName').value = entry.agentName;
+        document.getElementById('salesCount').value = entry.salesCount;
+        document.getElementById('target').value = entry.target;
+        document.getElementById('remarks').value = entry.remarks;
+        
+        // Remove the old entry
+        deleteEntry(id, false);
+    }
+}
+
+function deleteEntry(id, confirm = true) {
+    if (confirm && !window.confirm('Are you sure you want to delete this entry?')) {
+        return;
+    }
+    
+    const month = document.getElementById('monthSelector').value;
+    let monthData = getMonthData(month);
+    monthData.entries = monthData.entries.filter(e => e.id !== id);
+    saveMonthData(month, monthData);
+    
+    loadMonthData();
+}
+
+function createNewSheet() {
+    if (window.confirm('Create a new sheet? This will clear all entries for the current month.')) {
+        const month = document.getElementById('monthSelector').value;
+        saveMonthData(month, { entries: [] });
+        loadMonthData();
+    }
+}
+
+function saveSheet() {
+    alert('All changes are automatically saved to browser storage.');
+}
+
+function exportToExcel() {
+    const month = document.getElementById('monthSelector').value;
+    const monthData = getMonthData(month);
+    
+    let csv = 'Date,Agent Name,Sales Count,Target,Achievement %,Remarks\n';
+    
+    monthData.entries.forEach(entry => {
+        csv += `${entry.date},${entry.agentName},${entry.salesCount},${entry.target},${entry.achievement}%,${entry.remarks}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `sales_sheet_${month}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// Helper functions
+function getMonthKey(date) {
+    return date.substring(0, 7); // YYYY-MM
+}
+
+function formatYearMonth(date) {
+    return date.toISOString().substring(0, 7);
+}
+
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString();
+}
+
+function getMonthData(month) {
+    const data = localStorage.getItem(`sales_${month}`);
+    return data ? JSON.parse(data) : { entries: [] };
+}
+
+function saveMonthData(month, data) {
+    localStorage.setItem(`sales_${month}`, JSON.stringify(data));
+}
+
+function resetForm() {
+    document.getElementById('salesCount').value = '';
+    document.getElementById('target').value = '';
+    document.getElementById('remarks').value = '';
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    loadAgents();
+    setupMonthFilter();
+    
+    // Set default date to start of current week
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    document.getElementById('weekStart').valueAsDate = startOfWeek;
+});
+
+// Agent Management
+function loadAgents() {
+    const agents = getAgents();
+    const agentList = document.getElementById('agentList');
+    agentList.innerHTML = '';
+    
+    agents.forEach(agent => {
+        const card = document.createElement('div');
+        card.className = 'agent-card';
+        card.textContent = agent;
+        card.onclick = () => selectAgent(agent);
+        agentList.appendChild(card);
+    });
+}
+
+function getAgents() {
+    return JSON.parse(localStorage.getItem('agents') || '[]');
+}
+
+function selectAgent(agentName) {
+    localStorage.setItem('currentAgent', agentName);
+    document.getElementById('currentAgentName').textContent = agentName;
+    document.getElementById('agentSelection').style.display = 'none';
+    document.getElementById('salesScreen').style.display = 'block';
+    loadAgentSales();
+}
+
+function logout() {
+    localStorage.removeItem('currentAgent');
+    document.getElementById('agentSelection').style.display = 'flex';
+    document.getElementById('salesScreen').style.display = 'none';
+}
+
+function showAddAgentForm() {
+    document.getElementById('addAgentModal').style.display = 'flex';
+}
+
+function hideAddAgentForm() {
+    document.getElementById('addAgentModal').style.display = 'none';
+    document.getElementById('newAgentName').value = '';
+}
+
+function addNewAgent() {
+    const name = document.getElementById('newAgentName').value.trim();
+    if (!name) {
+        alert('Please enter agent name');
+        return;
+    }
+    
+    const agents = getAgents();
+    if (agents.includes(name)) {
+        alert('Agent already exists');
+        return;
+    }
+    
+    agents.push(name);
+    localStorage.setItem('agents', JSON.stringify(agents));
+    hideAddAgentForm();
+    loadAgents();
+}
+
+// Sales Management
+function addEntry() {
+    const agent = localStorage.getItem('currentAgent');
+    const weekStart = document.getElementById('weekStart').value;
+    const sales = parseInt(document.getElementById('salesCount').value) || 0;
+    const target = parseInt(document.getElementById('weeklyTarget').value) || 0;
+    const remarks = document.getElementById('remarks').value.trim();
+    
+    if (!validateEntry(weekStart)) return;
+    
+    const entry = {
+        id: Date.now(),
+        weekStart,
+        sales,
+        target,
+        remarks,
+        achievement: calculateAchievement(sales, target)
+    };
+    
+    // Save entry
+    const entries = getAgentSales(agent);
+    entries.push(entry);
+    saveAgentSales(agent, entries);
+    
+    // Reset form and reload
+    resetForm();
+    loadAgentSales();
+}
+
+function validateEntry(weekStart) {
+    if (!weekStart) {
+        alert('Please select week start date');
+        return false;
+    }
+    return true;
+}
+
+function calculateAchievement(sales, target) {
+    if (!target) return 0;
+    return Math.round((sales / target) * 100);
+}
+
+function loadAgentSales() {
+    const agent = localStorage.getItem('currentAgent');
+    const entries = getAgentSales(agent);
+    const month = document.getElementById('monthFilter').value;
+    
+    const filteredEntries = month ? 
+        entries.filter(entry => entry.weekStart.startsWith(month)) : 
+        entries;
+    
+    const salesHistory = document.getElementById('salesHistory');
+    salesHistory.innerHTML = '';
+    
+    filteredEntries.sort((a, b) => new Date(b.weekStart) - new Date(a.weekStart))
+        .forEach(entry => {
+            const row = document.createElement('div');
+            row.className = 'grid-row';
+            row.innerHTML = `
+                <div class="grid-cell">${formatDate(entry.weekStart)}</div>
+                <div class="grid-cell">${entry.sales}</div>
+                <div class="grid-cell">${entry.target}</div>
+                <div class="grid-cell">${entry.achievement}%</div>
+                <div class="grid-cell">${entry.remarks}</div>
+                <div class="grid-cell">
+                    <button class="action-btn edit-btn" onclick="editEntry(${entry.id})">Edit</button>
+                    <button class="action-btn delete-btn" onclick="deleteEntry(${entry.id})">Delete</button>
+                </div>
+            `;
+            salesHistory.appendChild(row);
+        });
+    
+    updatePerformanceSummary(filteredEntries);
+}
+
+function getAgentSales(agent) {
+    return JSON.parse(localStorage.getItem(`sales_${agent}`) || '[]');
+}
+
+function saveAgentSales(agent, entries) {
+    localStorage.setItem(`sales_${agent}`, JSON.stringify(entries));
+}
+
+function editEntry(id) {
+    const agent = localStorage.getItem('currentAgent');
+    const entries = getAgentSales(agent);
+    const entry = entries.find(e => e.id === id);
+    
+    if (entry) {
+        document.getElementById('weekStart').value = entry.weekStart;
+        document.getElementById('salesCount').value = entry.sales;
+        document.getElementById('weeklyTarget').value = entry.target;
+        document.getElementById('remarks').value = entry.remarks;
+        
+        // Remove the old entry
+        deleteEntry(id, false);
+    }
+}
+
+function deleteEntry(id, confirm = true) {
+    if (confirm && !window.confirm('Are you sure you want to delete this entry?')) {
+        return;
+    }
+    
+    const agent = localStorage.getItem('currentAgent');
+    const entries = getAgentSales(agent);
+    const updatedEntries = entries.filter(e => e.id !== id);
+    saveAgentSales(agent, updatedEntries);
+    
+    loadAgentSales();
+}
+
+function updatePerformanceSummary(entries) {
+    const totalSales = entries.reduce((sum, entry) => sum + entry.sales, 0);
+    const avgSales = entries.length ? Math.round(totalSales / entries.length) : 0;
+    const totalTarget = entries.reduce((sum, entry) => sum + entry.target, 0);
+    const achievement = totalTarget ? Math.round((totalSales / totalTarget) * 100) : 0;
+    
+    let bestWeek = '-';
+    if (entries.length) {
+        const best = entries.reduce((max, entry) => 
+            entry.sales > max.sales ? entry : max, entries[0]);
+        bestWeek = `${formatDate(best.weekStart)} (${best.sales})`;
+    }
+    
+    document.getElementById('totalSales').textContent = totalSales;
+    document.getElementById('avgSales').textContent = avgSales;
+    document.getElementById('achievementRate').textContent = `${achievement}%`;
+    document.getElementById('bestWeek').textContent = bestWeek;
+}
+
+function setupMonthFilter() {
+    const monthFilter = document.getElementById('monthFilter');
+    const currentYear = new Date().getFullYear();
+    const months = Array.from({length: 12}, (_, i) => {
+        const date = new Date(currentYear, i);
+        return {
+            value: date.toISOString().substring(0, 7),
+            label: date.toLocaleDateString('default', { month: 'long', year: 'numeric' })
+        };
+    });
+    
+    months.forEach(month => {
+        const option = document.createElement('option');
+        option.value = month.value;
+        option.textContent = month.label;
+        monthFilter.appendChild(option);
+    });
+    
+    monthFilter.addEventListener('change', loadAgentSales);
+}
+
+function resetForm() {
+    document.getElementById('salesCount').value = '';
+    document.getElementById('weeklyTarget').value = '';
+    document.getElementById('remarks').value = '';
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('default', { 
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+// Add event listeners
+document.getElementById('addEntry').addEventListener('click', addEntry);

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MS Office Sales Sheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+        }
+
+        .ms-header {
+            background: #2b579a;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .ms-title {
+            font-size: 24px;
+        }
+
+        .ms-menu {
+            background: #f3f2f1;
+            padding: 10px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .ms-menu button {
+            padding: 8px 16px;
+            margin-right: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .ms-menu button:hover {
+            background: #e1dfdd;
+        }
+
+        .ms-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ms-sheet {
+            background: white;
+            border: 1px solid #e1dfdd;
+            border-radius: 4px;
+            overflow: auto;
+        }
+
+        .ms-sheet table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ms-sheet th {
+            background: #f3f2f1;
+            border: 1px solid #e1dfdd;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .ms-sheet td {
+            border: 1px solid #e1dfdd;
+            padding: 12px;
+            min-width: 100px;
+        }
+
+        .ms-sheet input {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            outline: none;
+        }
+
+        .ms-sheet input:focus {
+            background: #e5f3ff;
+        }
+
+        .ms-toolbar {
+            padding: 10px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .ms-toolbar button {
+            padding: 6px 12px;
+            margin-right: 8px;
+            border: 1px solid #d1d1d1;
+            background: white;
+            cursor: pointer;
+        }
+
+        .ms-toolbar button:hover {
+            background: #f3f2f1;
+        }
+
+        .selected-cell {
+            background: #e5f3ff !important;
+        }
+
+        .ms-status {
+            padding: 10px;
+            background: #f3f2f1;
+            border-top: 1px solid #e1dfdd;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .totals-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #e1dfdd;
+            border-radius: 4px;
+        }
+
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .total-card {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .total-card h3 {
+            margin-bottom: 10px;
+            color: #2b579a;
+        }
+    </style>
+</head>
+<body>
+    <div class="ms-header">
+        <div class="ms-title">Sales Tracking Sheet</div>
+        <div class="ms-controls">
+            <button onclick="loadSalesData()">Refresh Data</button>
+            <button onclick="exportToExcel()">Export to Excel</button>
+        </div>
+    </div>
+
+    <div class="ms-menu">
+        <button onclick="showHome()">Home</button>
+        <button onclick="showInsert()">Insert</button>
+        <button onclick="showData()">Data</button>
+        <button onclick="showView()">View</button>
+    </div>
+
+    <div class="ms-toolbar">
+        <button onclick="addNewRow()">Add Row</button>
+        <button onclick="saveChanges()">Save Changes</button>
+        <button onclick="calculateTotals()">Calculate Totals</button>
+    </div>
+
+    <div class="ms-content">
+        <div class="ms-sheet">
+            <table id="salesTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Agent ID</th>
+                        <th>Agent Name</th>
+                        <th>Department</th>
+                        <th>Sales Count</th>
+                        <th>Target</th>
+                        <th>Achievement %</th>
+                        <th>Remarks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="salesData">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totals-section">
+            <h2>Department Totals</h2>
+            <div class="totals-grid" id="departmentTotals">
+                <!-- Totals will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="ms-status">
+        <div id="lastUpdate">Last updated: Never</div>
+        <div id="totalRecords">Total Records: 0</div>
+    </div>
+
+    <script>
+        // Connect to existing sales data
+        function loadSalesData() {
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            const tbody = document.getElementById('salesData');
+            tbody.innerHTML = '';
+            
+            agents.forEach(agent => {
+                const sales = JSON.parse(localStorage.getItem(`sales_${agent}`) || '[]');
+                
+                sales.forEach(entry => {
+                    const row = document.createElement('tr');
+                    const date = new Date(entry.date);
+                    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                    const timeStr = date.toLocaleTimeString();
+                    
+                    row.innerHTML = `
+                        <td>${entry.date}</td>
+                        <td>${dayName}</td>
+                        <td>${timeStr}</td>
+                        <td>${entry.agentId || 'AG' + Math.floor(Math.random() * 1000)}</td>
+                        <td>${agent}</td>
+                        <td>${entry.department || 'Sales'}</td>
+                        <td>${entry.sales}</td>
+                        <td>10</td>
+                        <td>${(entry.sales / 10 * 100).toFixed(1)}%</td>
+                        <td>${entry.remarks || ''}</td>
+                        <td>
+                            <button onclick="editRow(this)">Edit</button>
+                            <button onclick="deleteRow(this)">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+            
+            updateStatus();
+        }
+
+        function updateStatus() {
+            const now = new Date().toLocaleString();
+            document.getElementById('lastUpdate').textContent = `Last updated: ${now}`;
+            const records = document.getElementById('salesData').getElementsByTagName('tr').length;
+            document.getElementById('totalRecords').textContent = `Total Records: ${records}`;
+        }
+
+        function addNewRow() {
+            const tbody = document.getElementById('salesData');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="date"></td>
+                <td>-</td>
+                <td><input type="time"></td>
+                <td><input type="text" placeholder="AG001"></td>
+                <td><input type="text"></td>
+                <td><select>
+                    <option>Sales</option>
+                    <option>Marketing</option>
+                    <option>Support</option>
+                </select></td>
+                <td><input type="number"></td>
+                <td><input type="number" value="10"></td>
+                <td>0%</td>
+                <td><input type="text"></td>
+                <td>
+                    <button onclick="saveRow(this)">Save</button>
+                    <button onclick="deleteRow(this)">Cancel</button>
+                </td>
+            `;
+            tbody.insertBefore(row, tbody.firstChild);
+        }
+
+        function saveRow(button) {
+            const row = button.parentElement.parentElement;
+            const date = row.cells[0].querySelector('input').value;
+            const time = row.cells[2].querySelector('input').value;
+            const agentId = row.cells[3].querySelector('input').value;
+            const agent = row.cells[4].querySelector('input').value;
+            const department = row.cells[5].querySelector('select').value;
+            const sales = parseInt(row.cells[6].querySelector('input').value) || 0;
+            const target = parseInt(row.cells[7].querySelector('input').value) || 10;
+            const remarks = row.cells[9].querySelector('input').value;
+
+            if (!date || !agent) {
+                alert('Please fill in the date and agent name');
+                return;
+            }
+
+            // Save to localStorage
+            let agentSales = JSON.parse(localStorage.getItem(`sales_${agent}`) || '[]');
+            agentSales.push({
+                id: Date.now(),
+                date: date,
+                time: time,
+                agentId: agentId,
+                department: department,
+                sales: sales,
+                remarks: remarks
+            });
+            localStorage.setItem(`sales_${agent}`, JSON.stringify(agentSales));
+
+            // Update agents list if needed
+            let agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            if (!agents.includes(agent)) {
+                agents.push(agent);
+                localStorage.setItem('agents', JSON.stringify(agents));
+            }
+
+            // Reload data
+            loadSalesData();
+        }
+
+        function deleteRow(button) {
+            if (confirm('Are you sure you want to delete this row?')) {
+                const row = button.parentElement.parentElement;
+                row.remove();
+                updateStatus();
+            }
+        }
+
+        function editRow(button) {
+            const row = button.parentElement.parentElement;
+            const cells = row.cells;
+            
+            // Convert cells to input fields
+            cells[0].innerHTML = `<input type="date" value="${cells[0].textContent}">`;
+            cells[2].innerHTML = `<input type="time" value="${cells[2].textContent}">`;
+            cells[3].innerHTML = `<input type="text" value="${cells[3].textContent}">`;
+            cells[4].innerHTML = `<input type="text" value="${cells[4].textContent}">`;
+            cells[5].innerHTML = `<select>
+                <option ${cells[5].textContent === 'Sales' ? 'selected' : ''}>Sales</option>
+                <option ${cells[5].textContent === 'Marketing' ? 'selected' : ''}>Marketing</option>
+                <option ${cells[5].textContent === 'Support' ? 'selected' : ''}>Support</option>
+            </select>`;
+            cells[6].innerHTML = `<input type="number" value="${cells[6].textContent}">`;
+            cells[7].innerHTML = `<input type="number" value="${cells[7].textContent}">`;
+            cells[9].innerHTML = `<input type="text" value="${cells[9].textContent}">`;
+            cells[10].innerHTML = `
+                <button onclick="saveRow(this)">Save</button>
+                <button onclick="loadSalesData()">Cancel</button>
+            `;
+        }
+
+        function calculateTotals() {
+            const rows = document.getElementById('salesData').getElementsByTagName('tr');
+            let departmentTotals = {
+                'Sales': { sales: 0, count: 0 },
+                'Marketing': { sales: 0, count: 0 },
+                'Support': { sales: 0, count: 0 }
+            };
+            let totalSales = 0;
+            
+            for (let row of rows) {
+                const department = row.cells[5].textContent;
+                const sales = parseInt(row.cells[6].textContent) || 0;
+                
+                if (departmentTotals[department]) {
+                    departmentTotals[department].sales += sales;
+                    departmentTotals[department].count++;
+                }
+                totalSales += sales;
+            }
+
+            // Update totals display
+            const totalsDiv = document.getElementById('departmentTotals');
+            totalsDiv.innerHTML = '';
+
+            for (let [dept, data] of Object.entries(departmentTotals)) {
+                const card = document.createElement('div');
+                card.className = 'total-card';
+                card.innerHTML = `
+                    <h3>${dept}</h3>
+                    <p>Total Sales: ${data.sales}</p>
+                    <p>Entries: ${data.count}</p>
+                    <p>Average: ${data.count ? (data.sales / data.count).toFixed(1) : 0}</p>
+                `;
+                totalsDiv.appendChild(card);
+            }
+
+            // Save totals to localStorage for main website
+            localStorage.setItem('department_totals', JSON.stringify(departmentTotals));
+            localStorage.setItem('total_sales', totalSales.toString());
+
+            return departmentTotals;
+        }
+
+        // Auto calculate totals every minute
+        setInterval(calculateTotals, 60000);
+
+        // Calculate initial totals
+        document.addEventListener('DOMContentLoaded', calculateTotals);
+
+        function exportToExcel() {
+            const table = document.getElementById('salesTable');
+            const html = table.outerHTML;
+            const url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            const link = document.createElement('a');
+            link.download = 'sales_data.xls';
+            link.href = url;
+            link.click();
+        }
+
+        // Menu functions (can be expanded based on needs)
+        function showHome() {
+            // Implement home menu functionality
+        }
+
+        function showInsert() {
+            addNewRow();
+        }
+
+        function showData() {
+            calculateTotals();
+        }
+
+        function showView() {
+            // Implement view menu functionality
+        }
+    </script>
+</body>
+</html>

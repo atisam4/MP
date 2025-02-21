@@ -6,6 +6,143 @@
     <title>Office MP - Professional Call Center & Marketplace</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .agent-selector {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .agent-selector h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .agent-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .agent-card {
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .agent-card:hover {
+            background: #e9ecef;
+        }
+        .sales-form {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #0d6efd;
+            color: white;
+        }
+        .btn:hover {
+            background: #0b5ed7;
+        }
+        .sales-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .sales-table th, .sales-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .sales-table th {
+            background: #f8f9fa;
+        }
+        .action-btn {
+            padding: 4px 8px;
+            margin: 0 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .edit-btn {
+            background: #ffc107;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+        .department-totals {
+            background: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .department-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .department-card h3 {
+            color: #2b579a;
+            margin-bottom: 10px;
+        }
+
+        .total-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+    </style>
 </head>
 <body>
 
@@ -329,193 +466,225 @@
         </div>
     </section>
     <div class="container">
-        <div class="main-buttons">
-            <button class="action-button" onclick="openSalesModal()">Sales Entry</button>
-        </div>
-
-        <!-- Sales Entry Modal -->
-        <div id="salesModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeSalesModal()">&times;</span>
-                <div class="sales-container">
-                    <div class="report-header">
-                        <h1 class="report-title">Daily Sales Entry</h1>
-                        <div class="date-display">
-                            <span id="currentDate">2/21/2025</span>
-                        </div>
-                    </div>
-                    
-                    <div class="agent-section">
-                        <div class="agent-info">
-                            <h3>Agent: Bilal</h3>
-                            <div class="sales-count">
-                                Today's Sales: <span id="todaySales">2</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="calls-section">
-                        <h3>Today's Calls</h3>
-                        <table class="calls-table">
-                            <thead>
-                                <tr>
-                                    <th>Time</th>
-                                    <th>Customer Name</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="callsTableBody">
-                                <!-- Calls will be added here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>New Call Entry</h3>
-                        <div class="call-form">
-                            <div class="form-group">
-                                <label>Customer Name:</label>
-                                <input type="text" id="customerName" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label>Status:</label>
-                                <select id="callStatus" class="form-control">
-                                    <option value="Proved">Proved Call</option>
-                                    <option value="Not Proved">Not Proved</option>
-                                </select>
-                            </div>
-                            <button id="saveCall" class="btn">Save Call</button>
-                        </div>
-                    </div>
-
-                    <div class="summary-section">
-                        <div class="total-proved">
-                            Proved Calls: <span id="provedCallCount">0</span>
-                        </div>
-                        <div class="total-calls">
-                            Total Calls: <span id="totalCallCount">0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="monthly-sales-container">
-        <div class="header">
-            <h1>Monthly Sales Sheet</h1>
-            <div class="month-selector">
-                <select id="monthSelect" class="form-control">
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-                <select id="yearSelect" class="form-control">
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                </select>
+        <!-- Department Performance Section -->
+        <div class="department-totals">
+            <h2>Department Performance</h2>
+            <div class="totals-grid" id="departmentTotals">
+                <!-- Department totals will be displayed here -->
             </div>
         </div>
 
-        <div class="agent-login">
-            <input type="text" id="agentName" class="form-control" placeholder="Enter your name">
-            <button id="loginBtn" class="btn">Login</button>
+        <!-- Agent Selector -->
+        <div class="agent-selector" id="agentSelector">
+            <h2>Select Agent</h2>
+            <div class="agent-list" id="agentList">
+                <!-- Agents will be added here -->
+            </div>
+            <button class="btn" onclick="showAddAgentForm()">Add New Agent</button>
         </div>
 
-        <div id="salesContent" class="sales-content" style="display: none;">
-            <div class="agent-header">
-                <h2>Welcome, <span id="agentNameDisplay"></span></h2>
-                <div class="month-total">
-                    Monthly Total Sales: <span id="monthlyTotal">0</span>
-                </div>
+        <!-- Sales Entry Form -->
+        <div class="sales-form" id="salesForm" style="display: none;">
+            <h3>Enter Sales for <span id="currentAgent">Agent</span></h3>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="saleDate" class="form-control">
             </div>
+            <div class="form-group">
+                <label>Sales Count</label>
+                <input type="number" id="salesCount" class="form-control" min="0">
+            </div>
+            <div class="form-group">
+                <label>Remarks</label>
+                <input type="text" id="remarks" class="form-control">
+            </div>
+            <button class="btn" onclick="addSales()">Add Sales</button>
+        </div>
 
-            <div class="sales-grid">
-                <table class="month-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Sales</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="salesTableBody">
-                        <!-- Sales data will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="add-sales">
-                <h3>Add Sales</h3>
-                <div class="form-group">
-                    <label>Date:</label>
-                    <input type="date" id="salesDate" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Number of Sales:</label>
-                    <input type="number" id="salesCount" class="form-control" min="0" value="0">
-                </div>
-                <button id="addSales" class="btn">Add Sales</button>
-            </div>
-
-            <div class="summary-box">
-                <h3>Monthly Summary</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <label>Best Day:</label>
-                        <span id="bestDay">-</span>
-                    </div>
-                    <div class="summary-item">
-                        <label>Average Daily Sales:</label>
-                        <span id="avgSales">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <label>Days Worked:</label>
-                        <span id="daysWorked">0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="call-log-header">
-        <div class="logo-container">
-            <div class="logo">YOUR LOGO HERE</div>
-        </div>
-        <div class="header-info">
-            <h2>COMPANY NAME</h2>
-            <p>123 Street Name, ZIP City</p>
-            <p>(000) 1234 56789</p>
-            <p>Week Number: <span id="weekNumber"></span></p>
-            <p id="dateRange"></p>
-        </div>
-        <div class="operator-image">
-            <!-- Operator image or icon will be here -->
-        </div>
+        <!-- Sales Table -->
+        <table class="sales-table" id="salesTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Sales</th>
+                    <th>Remarks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="salesData">
+                <!-- Sales data will be added here -->
+            </tbody>
+        </table>
     </div>
 
-    <table class="call-log-table">
-        <thead>
-            <tr>
-                <th>DAY/DATE</th>
-                <th>TIME</th>
-                <th>PERSON CALLED</th>
-                <th>COMPANY NAME</th>
-                <th>ACTION TO BE TAKEN / NOTES</th>
-            </tr>
-        </thead>
-        <tbody id="callLogBody">
-            <!-- Table rows will be dynamically added here -->
-        </tbody>
-    </table>
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAgents();
+            document.getElementById('saleDate').valueAsDate = new Date();
+            updateDepartmentTotals();
+        });
+
+        // Load agents
+        function loadAgents() {
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            const agentList = document.getElementById('agentList');
+            agentList.innerHTML = '';
+            
+            agents.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = 'agent-card';
+                card.textContent = agent;
+                card.onclick = () => selectAgent(agent);
+                agentList.appendChild(card);
+            });
+        }
+
+        // Show add agent form
+        function showAddAgentForm() {
+            const name = prompt('Enter agent name:');
+            if (name && name.trim()) {
+                const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+                if (!agents.includes(name)) {
+                    agents.push(name);
+                    localStorage.setItem('agents', JSON.stringify(agents));
+                    loadAgents();
+                } else {
+                    alert('Agent already exists!');
+                }
+            }
+        }
+
+        // Select agent
+        function selectAgent(agent) {
+            document.getElementById('currentAgent').textContent = agent;
+            document.getElementById('salesForm').style.display = 'block';
+            document.getElementById('salesTable').style.display = 'table';
+            loadSales(agent);
+        }
+
+        // Add sales
+        function addSales() {
+            const agent = document.getElementById('currentAgent').textContent;
+            const date = document.getElementById('saleDate').value;
+            const sales = parseInt(document.getElementById('salesCount').value) || 0;
+            const remarks = document.getElementById('remarks').value;
+
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            const entry = {
+                id: Date.now(),
+                date,
+                sales,
+                remarks
+            };
+
+            const agentSales = JSON.parse(localStorage.getItem(`sales_${agent}`) || '[]');
+            agentSales.push(entry);
+            localStorage.setItem(`sales_${agent}`, JSON.stringify(agentSales));
+
+            // Reset form
+            document.getElementById('salesCount').value = '';
+            document.getElementById('remarks').value = '';
+
+            // Reload sales
+            loadSales(agent);
+        }
+
+        // Load sales
+        function loadSales(agent) {
+            const sales = JSON.parse(localStorage.getItem(`sales_${agent}`) || '[]');
+            const tbody = document.getElementById('salesData');
+            tbody.innerHTML = '';
+
+            sales.sort((a, b) => new Date(b.date) - new Date(a.date))
+                .forEach(entry => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${formatDate(entry.date)}</td>
+                        <td>${entry.sales}</td>
+                        <td>${entry.remarks}</td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="editSales('${agent}', ${entry.id})">Edit</button>
+                            <button class="action-btn delete-btn" onclick="deleteSales('${agent}', ${entry.id})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+        }
+
+        // Edit sales
+        function editSales(agent, id) {
+            const sales = JSON.parse(localStorage.getItem(`sales_${agent}`) || '[]');
+            const entry = sales.find(s => s.id === id);
+            
+            if (entry) {
+                document.getElementById('saleDate').value = entry.date;
+                document.getElementById('salesCount').value = entry.sales;
+                document.getElementById('remarks').value = entry.remarks;
+                
+                // Remove the old entry
+                deleteSales(agent, id, false);
+            }
+        }
+
+        // Delete sales
+        function deleteSales(agent, id, confirm = true) {
+            if (confirm && !window.confirm('Are you sure you want to delete this entry?')) {
+                return;
+            }
+
+            const sales = JSON.parse(localStorage.getItem(`sales_${agent}`) || '[]');
+            const updatedSales = sales.filter(s => s.id !== id);
+            localStorage.setItem(`sales_${agent}`, JSON.stringify(updatedSales));
+            loadSales(agent);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+
+        // Update department totals
+        function updateDepartmentTotals() {
+            const totals = JSON.parse(localStorage.getItem('department_totals') || '{}');
+            const totalSales = parseInt(localStorage.getItem('total_sales') || '0');
+            const totalsDiv = document.getElementById('departmentTotals');
+            
+            if (totalsDiv) {
+                totalsDiv.innerHTML = '';
+                
+                // Add total card
+                const totalCard = document.createElement('div');
+                totalCard.className = 'department-card';
+                totalCard.innerHTML = `
+                    <h3>Total Sales</h3>
+                    <div class="total-number">${totalSales}</div>
+                `;
+                totalsDiv.appendChild(totalCard);
+
+                // Add department cards
+                for (let [dept, data] of Object.entries(totals)) {
+                    const card = document.createElement('div');
+                    card.className = 'department-card';
+                    card.innerHTML = `
+                        <h3>${dept}</h3>
+                        <div class="total-number">${data.sales}</div>
+                        <p>Entries: ${data.count}</p>
+                        <p>Average: ${data.count ? (data.sales / data.count).toFixed(1) : 0}</p>
+                    `;
+                    totalsDiv.appendChild(card);
+                }
+            }
+        }
+
+        // Update totals every minute
+        setInterval(updateDepartmentTotals, 60000);
+    </script>
 </main>
 
 <footer>
@@ -552,75 +721,6 @@
         <p>&copy; 2025 Office MP. All rights reserved.</p>
     </div>
 </footer>
-
-<div class="sales-container">
-    <h1 class="main-title">Call Center Sales Sheet</h1>
-        
-    <!-- Add New Entry Form -->
-    <div class="entry-form">
-        <h2>Add Sales Entry</h2>
-        <div class="form-group">
-            <label for="agentName">Agent Name:</label>
-            <input type="text" id="agentName" class="form-control" placeholder="Enter agent name">
-        </div>
-        <div class="form-group">
-            <label for="salesDate">Date:</label>
-            <input type="date" id="salesDate" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="salesCount">Sales Count:</label>
-            <input type="number" id="salesCount" class="form-control" min="0" value="0">
-        </div>
-        <div class="form-group">
-            <label for="remarks">Remarks:</label>
-            <textarea id="remarks" class="form-control" placeholder="Any additional notes"></textarea>
-        </div>
-        <button id="addEntry" class="btn btn-primary">Add Entry</button>
-    </div>
-
-    <!-- Sales Table -->
-    <div class="sales-table-container">
-        <h2>Sales Records</h2>
-        <div class="table-filters">
-            <input type="text" id="searchAgent" class="form-control" placeholder="Search by agent name">
-            <input type="date" id="filterDate" class="form-control">
-            <button id="clearFilters" class="btn">Clear Filters</button>
-        </div>
-        <table class="sales-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Agent Name</th>
-                    <th>Sales Count</th>
-                    <th>Remarks</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="salesTableBody">
-                <!-- Sales entries will be added here -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Summary Section -->
-    <div class="summary-section">
-        <h2>Today's Summary</h2>
-        <div class="summary-grid">
-            <div class="summary-item">
-                <label>Total Sales Today:</label>
-                <span id="todayTotal">0</span>
-            </div>
-            <div class="summary-item">
-                <label>Top Agent Today:</label>
-                <span id="topAgent">-</span>
-            </div>
-            <div class="summary-item">
-                <label>Active Agents Today:</label>
-                <span id="activeAgents">0</span>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="script.js"></script>
 </body>
