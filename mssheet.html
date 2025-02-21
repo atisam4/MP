@@ -248,6 +248,142 @@
         .summary-row:last-child {
             border-bottom: none;
         }
+
+        .agent-stats-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .agent-stats-container h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+        }
+
+        .stats-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #f1f1f1;
+        }
+
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .agent-stats {
+            display: none;
+        }
+
+        .agent-stats.active {
+            display: block;
+        }
+
+        .agent-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+        }
+
+        .agent-name {
+            font-weight: bold;
+            color: #2c3e50;
+            width: 120px;
+        }
+
+        .sales-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .sales-count {
+            background: #3498db;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .laptop-count {
+            background: #2ecc71;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .monthly-target {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .agent-sales {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sales-count {
+            background: #f1c40f;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .sales-amount {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .laptop-ratio {
+            color: #8e44ad;
+            font-weight: bold;
+        }
+
+        .performance-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .indicator-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .indicator-good {
+            background-color: #2ecc71;
+        }
+
+        .indicator-average {
+            background-color: #f1c40f;
+        }
+
+        .indicator-below {
+            background-color: #e74c3c;
+        }
     </style>
 </head>
 <body>
@@ -296,6 +432,31 @@
     </div>
 
     <div class="ms-content">
+        <div class="sales-summary">
+            <div class="summary-card">
+                <h3>Total Sales</h3>
+                <p id="totalSales">₹0</p>
+            </div>
+            <div class="summary-card">
+                <h3>Total Laptops</h3>
+                <p id="totalLaptops">0</p>
+            </div>
+        </div>
+
+        <div class="agent-stats-container">
+            <h3>Agent Sales Summary</h3>
+            <div class="stats-tabs">
+                <button class="tab-btn active" onclick="showStats('daily')">Today's Sales</button>
+                <button class="tab-btn" onclick="showStats('monthly')">Monthly Sales</button>
+            </div>
+            <div id="dailyStats" class="agent-stats active">
+                <!-- Daily stats will be loaded here -->
+            </div>
+            <div id="monthlyStats" class="agent-stats">
+                <!-- Monthly stats will be loaded here -->
+            </div>
+        </div>
+
         <div class="filter-section">
             <h3>View Sales History</h3>
             <div class="filter-controls">
@@ -349,6 +510,7 @@
 
     <script>
         const API_URL = 'http://localhost/MP/backend/submit.php';
+        let currentStatsView = 'daily';
 
         async function submitSales() {
             const agent = document.getElementById('agentSelect').value;
@@ -379,6 +541,7 @@
                 if (result.status === 'success') {
                     alert('Sales data submitted successfully');
                     loadSalesData();
+                    loadAgentStats(); // Reload agent stats after submission
                     // Clear form
                     document.getElementById('agentSelect').value = '';
                     document.getElementById('salesDate').value = '';
@@ -626,6 +789,110 @@
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             return diffDays || 1; // Return at least 1 to avoid division by zero
         }
+
+        function showStats(type) {
+            currentStatsView = type;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.agent-stats').forEach(stat => stat.classList.remove('active'));
+            
+            document.querySelector(`.tab-btn[onclick="showStats('${type}')"]`).classList.add('active');
+            document.getElementById(`${type}Stats`).classList.add('active');
+            
+            loadAgentStats();
+        }
+
+        async function loadAgentStats() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+                
+                const response = await fetch(`${API_URL}?start_date=${firstDayOfMonth}&end_date=${today}`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const agents = ['Bilal', 'Danish', 'Aitzaz', 'Hanzalah', 'Mohsin', 'Hashir'];
+                    const dailyStats = {};
+                    const monthlyStats = {};
+                    
+                    // Initialize stats
+                    agents.forEach(agent => {
+                        dailyStats[agent] = { count: 0, amount: 0 };
+                        monthlyStats[agent] = { count: 0, amount: 0 };
+                    });
+
+                    // Calculate stats
+                    result.data.forEach(row => {
+                        if (row.date === today) {
+                            dailyStats[row.agent].count++;
+                            dailyStats[row.agent].amount += parseFloat(row.amount);
+                        }
+                        monthlyStats[row.agent].count++;
+                        monthlyStats[row.agent].amount += parseFloat(row.amount);
+                    });
+
+                    // Calculate days passed in the month
+                    const currentDate = new Date();
+                    const daysPassed = currentDate.getDate();
+
+                    // Header for both views
+                    const headerHtml = `
+                        <div class="stats-header">
+                            <div>Agent Name</div>
+                            <div>Sales Count</div>
+                            <div>Amount</div>
+                            <div>Laptops</div>
+                        </div>
+                    `;
+
+                    // Update UI
+                    const dailyHtml = agents.map(agent => {
+                        const laptops = Math.floor(dailyStats[agent].amount / 45000);
+                        return `
+                            <div class="agent-row">
+                                <div class="agent-name">${agent}</div>
+                                <div class="sales-info">
+                                    <div class="sales-count">${dailyStats[agent].count} Sales Today</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    const monthlyHtml = agents.map(agent => {
+                        const monthSales = monthlyStats[agent].count;
+                        // Calculate laptops: 1.5 laptops per 28 sales in 22 days
+                        const laptops = Math.floor((monthSales / 28) * 1.5);
+                        
+                        return `
+                            <div class="agent-row">
+                                <div class="agent-name">${agent}</div>
+                                <div class="sales-info">
+                                    <div class="sales-count">${monthSales} Sales</div>
+                                    <div class="laptop-count">${laptops} Laptops</div>
+                                    <div class="monthly-target">
+                                        Target: 28 Sales = 1.5 Laptops
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('dailyStats').innerHTML = `
+                        <h3>Today's Sales</h3>
+                        ${dailyHtml}
+                    `;
+                    
+                    document.getElementById('monthlyStats').innerHTML = `
+                        <h3>Monthly Sales & Laptops</h3>
+                        ${monthlyHtml}
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Load agent stats on page load and after each submission
+        loadAgentStats();
     </script>
 </body>
 </html>
