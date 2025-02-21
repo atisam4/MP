@@ -500,7 +500,7 @@ function saveSale(sale) {
 
 function loadSavedSales() {
     const sales = JSON.parse(localStorage.getItem('sales') || '[]');
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString();
     const salesList = document.getElementById('salesList');
     
     salesList.innerHTML = '';
@@ -522,7 +522,7 @@ function loadSavedSales() {
 
 function updateTotals() {
     const sales = JSON.parse(localStorage.getItem('sales') || '[]');
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString();
     const totalsList = document.getElementById('totalsList');
     const agents = {};
     
@@ -673,4 +673,539 @@ function updateConversionRate() {
     } else {
         document.getElementById('conversionRate').textContent = '0%';
     }
+}
+
+// Set today's date when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    document.getElementById('entryDate').valueAsDate = today;
+    
+    // Add event listeners
+    document.getElementById('addAgent').addEventListener('click', addNewAgent);
+    document.getElementById('saveSales').addEventListener('click', saveSalesData);
+    document.getElementById('clearSales').addEventListener('click', clearSalesData);
+    
+    // Load any saved data
+    loadSavedData();
+});
+
+function addNewAgent() {
+    const agentName = document.getElementById('newAgent').value.trim();
+    if (!agentName) {
+        alert('Please enter an agent name');
+        return;
+    }
+    
+    const tbody = document.getElementById('salesTableBody');
+    const row = document.createElement('tr');
+    
+    row.innerHTML = `
+        <td>${agentName}</td>
+        <td><input type="number" class="sales-amount" min="0" value="0"></td>
+        <td><button class="delete-btn" onclick="deleteAgent(this)">Delete</button></td>
+    `;
+    
+    tbody.appendChild(row);
+    document.getElementById('newAgent').value = '';
+    updateTotals();
+}
+
+function deleteAgent(button) {
+    button.closest('tr').remove();
+    updateTotals();
+}
+
+function updateTotals() {
+    const rows = document.getElementById('salesTableBody').getElementsByTagName('tr');
+    let totalSales = 0;
+    
+    for (let row of rows) {
+        const salesInput = row.querySelector('.sales-amount');
+        totalSales += Number(salesInput.value) || 0;
+    }
+    
+    document.getElementById('totalSalesAmount').textContent = totalSales;
+    document.getElementById('totalAgents').textContent = rows.length;
+}
+
+function saveSalesData() {
+    const date = document.getElementById('entryDate').value;
+    const salesData = {
+        date: date,
+        agents: []
+    };
+    
+    const rows = document.getElementById('salesTableBody').getElementsByTagName('tr');
+    for (let row of rows) {
+        salesData.agents.push({
+            name: row.cells[0].textContent,
+            sales: Number(row.querySelector('.sales-amount').value) || 0
+        });
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('salesData_' + date, JSON.stringify(salesData));
+    alert('Sales data saved successfully!');
+}
+
+function loadSavedData() {
+    const date = document.getElementById('entryDate').value;
+    const savedData = localStorage.getItem('salesData_' + date);
+    
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        const tbody = document.getElementById('salesTableBody');
+        tbody.innerHTML = '';
+        
+        data.agents.forEach(agent => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${agent.name}</td>
+                <td><input type="number" class="sales-amount" min="0" value="${agent.sales}"></td>
+                <td><button class="delete-btn" onclick="deleteAgent(this)">Delete</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        updateTotals();
+    }
+}
+
+function clearSalesData() {
+    if (confirm('Are you sure you want to clear all sales data?')) {
+        document.getElementById('salesTableBody').innerHTML = '';
+        document.getElementById('newAgent').value = '';
+        updateTotals();
+    }
+}
+
+// Add event listener for date change
+document.getElementById('entryDate').addEventListener('change', loadSavedData);
+
+// Add event listener for sales amount changes
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('sales-amount')) {
+        updateTotals();
+    }
+});
+
+// Call Tracking and Proved Calls
+document.addEventListener('DOMContentLoaded', function() {
+    // Set current date
+    const today = new Date();
+    document.getElementById('currentDate').textContent = today.toLocaleDateString();
+    
+    // Initialize event listeners
+    document.getElementById('saveCall').addEventListener('click', saveCall);
+    
+    // Load today's data
+    loadTodaysCalls();
+});
+
+function saveCall() {
+    const customerName = document.getElementById('customerName').value.trim();
+    const status = document.getElementById('callStatus').value;
+    
+    if (!customerName) {
+        alert('Please enter customer name');
+        return;
+    }
+    
+    const currentTime = new Date().toLocaleTimeString();
+    addCallToTable(currentTime, customerName, status);
+    
+    // Clear form
+    document.getElementById('customerName').value = '';
+    document.getElementById('callStatus').value = 'Proved';
+    
+    // Update counts
+    updateCounts();
+    
+    // Save to localStorage
+    saveTodaysCalls();
+}
+
+function addCallToTable(time, customerName, status) {
+    const tbody = document.getElementById('callsTableBody');
+    const row = document.createElement('tr');
+    
+    row.innerHTML = `
+        <td>${time}</td>
+        <td>${customerName}</td>
+        <td class="${status.toLowerCase()}">${status}</td>
+        <td>
+            <button class="btn btn-sm" onclick="editCall(this)">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteCall(this)">Delete</button>
+        </td>
+    `;
+    
+    tbody.appendChild(row);
+}
+
+function editCall(button) {
+    const row = button.closest('tr');
+    const customerName = row.cells[1].textContent;
+    const status = row.cells[2].textContent;
+    
+    document.getElementById('customerName').value = customerName;
+    document.getElementById('callStatus').value = status;
+    
+    // Remove the old row as we'll add a new one when saved
+    row.remove();
+    updateCounts();
+}
+
+function deleteCall(button) {
+    if (confirm('Are you sure you want to delete this call?')) {
+        button.closest('tr').remove();
+        updateCounts();
+        saveTodaysCalls();
+    }
+}
+
+function updateCounts() {
+    const rows = document.getElementById('callsTableBody').getElementsByTagName('tr');
+    let provedCount = 0;
+    
+    for (let row of rows) {
+        if (row.cells[2].textContent === 'Proved') {
+            provedCount++;
+        }
+    }
+    
+    document.getElementById('provedCallCount').textContent = provedCount;
+    document.getElementById('totalCallCount').textContent = rows.length;
+    document.getElementById('todaySales').textContent = provedCount;
+}
+
+function saveTodaysCalls() {
+    const rows = document.getElementById('callsTableBody').getElementsByTagName('tr');
+    const calls = [];
+    
+    for (let row of rows) {
+        calls.push({
+            time: row.cells[0].textContent,
+            customerName: row.cells[1].textContent,
+            status: row.cells[2].textContent
+        });
+    }
+    
+    const today = new Date().toLocaleDateString();
+    localStorage.setItem('calls_' + today, JSON.stringify(calls));
+}
+
+function loadTodaysCalls() {
+    const today = new Date().toLocaleDateString();
+    const savedCalls = localStorage.getItem('calls_' + today);
+    
+    if (savedCalls) {
+        const calls = JSON.parse(savedCalls);
+        const tbody = document.getElementById('callsTableBody');
+        tbody.innerHTML = '';
+        
+        calls.forEach(call => {
+            addCallToTable(call.time, call.customerName, call.status);
+        });
+        
+        updateCounts();
+    }
+}
+
+// Monthly Sales Sheet Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Set current month and year
+    const today = new Date();
+    document.getElementById('monthSelect').value = today.getMonth() + 1;
+    document.getElementById('yearSelect').value = today.getFullYear();
+    document.getElementById('salesDate').valueAsDate = today;
+    
+    // Add event listeners
+    document.getElementById('loginBtn').addEventListener('click', loginAgent);
+    document.getElementById('addSales').addEventListener('click', addSales);
+    document.getElementById('monthSelect').addEventListener('change', loadMonthlySales);
+    document.getElementById('yearSelect').addEventListener('change', loadMonthlySales);
+});
+
+function loginAgent() {
+    const agentName = document.getElementById('agentName').value.trim();
+    if (!agentName) {
+        alert('Please enter your name');
+        return;
+    }
+    
+    document.getElementById('agentNameDisplay').textContent = agentName;
+    document.getElementById('salesContent').style.display = 'block';
+    loadMonthlySales();
+}
+
+function addSales() {
+    const date = document.getElementById('salesDate').value;
+    const sales = parseInt(document.getElementById('salesCount').value) || 0;
+    const agentName = document.getElementById('agentName').value;
+    
+    if (!date) {
+        alert('Please select a date');
+        return;
+    }
+    
+    // Check if date is within selected month/year
+    const selectedMonth = document.getElementById('monthSelect').value;
+    const selectedYear = document.getElementById('yearSelect').value;
+    const salesDate = new Date(date);
+    
+    if (salesDate.getMonth() + 1 != selectedMonth || salesDate.getFullYear() != selectedYear) {
+        alert('Please select a date within the current month/year');
+        return;
+    }
+    
+    saveSalesEntry(date, sales);
+    loadMonthlySales();
+    
+    // Clear inputs
+    document.getElementById('salesCount').value = '0';
+}
+
+function saveSalesEntry(date, sales) {
+    const agentName = document.getElementById('agentName').value;
+    const month = document.getElementById('monthSelect').value;
+    const year = document.getElementById('yearSelect').value;
+    const key = `sales_${agentName}_${year}_${month}`;
+    
+    let monthData = JSON.parse(localStorage.getItem(key) || '{}');
+    monthData[date] = sales;
+    
+    localStorage.setItem(key, JSON.stringify(monthData));
+}
+
+function loadMonthlySales() {
+    const agentName = document.getElementById('agentName').value;
+    const month = document.getElementById('monthSelect').value;
+    const year = document.getElementById('yearSelect').value;
+    const key = `sales_${agentName}_${year}_${month}`;
+    
+    const monthData = JSON.parse(localStorage.getItem(key) || '{}');
+    const tbody = document.getElementById('salesTableBody');
+    tbody.innerHTML = '';
+    
+    let totalSales = 0;
+    let bestDay = null;
+    let bestSales = 0;
+    
+    Object.entries(monthData)
+        .sort(([a], [b]) => new Date(a) - new Date(b))
+        .forEach(([date, sales]) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${formatDate(date)}</td>
+                <td>${sales}</td>
+                <td>
+                    <button class="edit-btn" onclick="editSales('${date}', ${sales})">Edit</button>
+                    <button class="delete-btn" onclick="deleteSales('${date}')">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            
+            totalSales += sales;
+            if (sales > bestSales) {
+                bestSales = sales;
+                bestDay = date;
+            }
+        });
+    
+    // Update summary
+    document.getElementById('monthlyTotal').textContent = totalSales;
+    document.getElementById('bestDay').textContent = bestDay ? formatDate(bestDay) + ` (${bestSales})` : '-';
+    document.getElementById('daysWorked').textContent = Object.keys(monthData).length;
+    document.getElementById('avgSales').textContent = Object.keys(monthData).length ? 
+        (totalSales / Object.keys(monthData).length).toFixed(1) : '0';
+}
+
+function editSales(date, sales) {
+    document.getElementById('salesDate').value = date;
+    document.getElementById('salesCount').value = sales;
+}
+
+function deleteSales(date) {
+    if (confirm('Are you sure you want to delete this entry?')) {
+        const agentName = document.getElementById('agentName').value;
+        const month = document.getElementById('monthSelect').value;
+        const year = document.getElementById('yearSelect').value;
+        const key = `sales_${agentName}_${year}_${month}`;
+        
+        let monthData = JSON.parse(localStorage.getItem(key) || '{}');
+        delete monthData[date];
+        
+        localStorage.setItem(key, JSON.stringify(monthData));
+        loadMonthlySales();
+    }
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Set today's date as default
+    document.getElementById('salesDate').valueAsDate = new Date();
+    document.getElementById('filterDate').valueAsDate = new Date();
+    
+    // Add event listeners
+    document.getElementById('addEntry').addEventListener('click', addSalesEntry);
+    document.getElementById('searchAgent').addEventListener('input', filterSales);
+    document.getElementById('filterDate').addEventListener('change', filterSales);
+    document.getElementById('clearFilters').addEventListener('click', clearFilters);
+    
+    // Load existing entries
+    loadSalesEntries();
+});
+
+function addSalesEntry() {
+    const agentName = document.getElementById('agentName').value.trim();
+    const date = document.getElementById('salesDate').value;
+    const sales = parseInt(document.getElementById('salesCount').value) || 0;
+    const remarks = document.getElementById('remarks').value.trim();
+    
+    if (!agentName) {
+        alert('Please enter agent name');
+        return;
+    }
+    
+    if (!date) {
+        alert('Please select date');
+        return;
+    }
+    
+    const entry = {
+        id: Date.now(),
+        agentName,
+        date,
+        sales,
+        remarks,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Save to localStorage
+    let entries = JSON.parse(localStorage.getItem('salesEntries') || '[]');
+    entries.push(entry);
+    localStorage.setItem('salesEntries', JSON.stringify(entries));
+    
+    // Clear form
+    document.getElementById('salesCount').value = '0';
+    document.getElementById('remarks').value = '';
+    
+    // Reload table
+    loadSalesEntries();
+}
+
+function loadSalesEntries() {
+    const entries = JSON.parse(localStorage.getItem('salesEntries') || '[]');
+    const tbody = document.getElementById('salesTableBody');
+    tbody.innerHTML = '';
+    
+    entries.sort((a, b) => new Date(b.date) - new Date(a.date))
+          .forEach(entry => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${formatDate(entry.date)}</td>
+            <td>${entry.agentName}</td>
+            <td>${entry.sales}</td>
+            <td>${entry.remarks}</td>
+            <td>
+                <button class="action-btn edit-btn" onclick="editEntry(${entry.id})">Edit</button>
+                <button class="action-btn delete-btn" onclick="deleteEntry(${entry.id})">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    updateSummary();
+}
+
+function editEntry(id) {
+    const entries = JSON.parse(localStorage.getItem('salesEntries') || '[]');
+    const entry = entries.find(e => e.id === id);
+    
+    if (entry) {
+        document.getElementById('agentName').value = entry.agentName;
+        document.getElementById('salesDate').value = entry.date;
+        document.getElementById('salesCount').value = entry.sales;
+        document.getElementById('remarks').value = entry.remarks;
+        
+        // Remove the old entry
+        deleteEntry(id, false);
+        
+        // Scroll to form
+        document.querySelector('.entry-form').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function deleteEntry(id, confirm = true) {
+    if (confirm && !window.confirm('Are you sure you want to delete this entry?')) {
+        return;
+    }
+    
+    let entries = JSON.parse(localStorage.getItem('salesEntries') || '[]');
+    entries = entries.filter(e => e.id !== id);
+    localStorage.setItem('salesEntries', JSON.stringify(entries));
+    
+    loadSalesEntries();
+}
+
+function filterSales() {
+    const searchTerm = document.getElementById('searchAgent').value.toLowerCase();
+    const filterDate = document.getElementById('filterDate').value;
+    const rows = document.getElementById('salesTableBody').getElementsByTagName('tr');
+    
+    Array.from(rows).forEach(row => {
+        const agentName = row.cells[1].textContent.toLowerCase();
+        const date = row.cells[0].textContent;
+        
+        const matchesSearch = agentName.includes(searchTerm);
+        const matchesDate = !filterDate || date === formatDate(filterDate);
+        
+        row.style.display = matchesSearch && matchesDate ? '' : 'none';
+    });
+}
+
+function clearFilters() {
+    document.getElementById('searchAgent').value = '';
+    document.getElementById('filterDate').valueAsDate = new Date();
+    filterSales();
+}
+
+function updateSummary() {
+    const today = new Date().toISOString().split('T')[0];
+    const entries = JSON.parse(localStorage.getItem('salesEntries') || '[]');
+    
+    // Filter today's entries
+    const todayEntries = entries.filter(e => e.date === today);
+    
+    // Calculate total sales
+    const totalSales = todayEntries.reduce((sum, entry) => sum + entry.sales, 0);
+    
+    // Find top agent
+    const agentSales = {};
+    todayEntries.forEach(entry => {
+        agentSales[entry.agentName] = (agentSales[entry.agentName] || 0) + entry.sales;
+    });
+    
+    let topAgent = '-';
+    let maxSales = 0;
+    Object.entries(agentSales).forEach(([agent, sales]) => {
+        if (sales > maxSales) {
+            maxSales = sales;
+            topAgent = `${agent} (${sales})`;
+        }
+    });
+    
+    // Update summary
+    document.getElementById('todayTotal').textContent = totalSales;
+    document.getElementById('topAgent').textContent = topAgent;
+    document.getElementById('activeAgents').textContent = Object.keys(agentSales).length;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
 }

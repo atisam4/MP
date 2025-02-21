@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office MP - Professional Call Center & Marketplace</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <title>Office MP - Professional Call Center & Marketplace</title>
 </head>
 <body>
 
@@ -337,28 +337,150 @@
         <div id="salesModal" class="modal">
             <div class="modal-content">
                 <span class="close-btn" onclick="closeSalesModal()">&times;</span>
-                <div class="sales-report">
+                <div class="sales-container">
                     <div class="report-header">
                         <h1 class="report-title">Daily Sales Entry</h1>
+                        <div class="date-display">
+                            <span id="currentDate">2/21/2025</span>
+                        </div>
                     </div>
-                    <table class="sales-table">
-                        <thead>
-                            <tr>
-                                <th>Customer Name</th>
-                                <th>Product/Service</th>
-                                <th>Quantity</th>
-                                <th>Price (Per Unit)</th>
-                                <th>Total Amount</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="salesTableBody">
-                            <!-- Sales rows will be added here dynamically -->
-                        </tbody>
-                    </table>
-                    <div class="button-group">
-                        <button id="addRow" class="btn">Add New Sale</button>
-                        <button id="clearAll" class="btn btn-danger">Clear All</button>
+                    
+                    <div class="agent-section">
+                        <div class="agent-info">
+                            <h3>Agent: Bilal</h3>
+                            <div class="sales-count">
+                                Today's Sales: <span id="todaySales">2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calls-section">
+                        <h3>Today's Calls</h3>
+                        <table class="calls-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Customer Name</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="callsTableBody">
+                                <!-- Calls will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>New Call Entry</h3>
+                        <div class="call-form">
+                            <div class="form-group">
+                                <label>Customer Name:</label>
+                                <input type="text" id="customerName" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Status:</label>
+                                <select id="callStatus" class="form-control">
+                                    <option value="Proved">Proved Call</option>
+                                    <option value="Not Proved">Not Proved</option>
+                                </select>
+                            </div>
+                            <button id="saveCall" class="btn">Save Call</button>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <div class="total-proved">
+                            Proved Calls: <span id="provedCallCount">0</span>
+                        </div>
+                        <div class="total-calls">
+                            Total Calls: <span id="totalCallCount">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="monthly-sales-container">
+        <div class="header">
+            <h1>Monthly Sales Sheet</h1>
+            <div class="month-selector">
+                <select id="monthSelect" class="form-control">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select id="yearSelect" class="form-control">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="agent-login">
+            <input type="text" id="agentName" class="form-control" placeholder="Enter your name">
+            <button id="loginBtn" class="btn">Login</button>
+        </div>
+
+        <div id="salesContent" class="sales-content" style="display: none;">
+            <div class="agent-header">
+                <h2>Welcome, <span id="agentNameDisplay"></span></h2>
+                <div class="month-total">
+                    Monthly Total Sales: <span id="monthlyTotal">0</span>
+                </div>
+            </div>
+
+            <div class="sales-grid">
+                <table class="month-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Sales</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody">
+                        <!-- Sales data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="add-sales">
+                <h3>Add Sales</h3>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="salesDate" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Number of Sales:</label>
+                    <input type="number" id="salesCount" class="form-control" min="0" value="0">
+                </div>
+                <button id="addSales" class="btn">Add Sales</button>
+            </div>
+
+            <div class="summary-box">
+                <h3>Monthly Summary</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <label>Best Day:</label>
+                        <span id="bestDay">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <label>Average Daily Sales:</label>
+                        <span id="avgSales">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <label>Days Worked:</label>
+                        <span id="daysWorked">0</span>
                     </div>
                 </div>
             </div>
@@ -430,6 +552,75 @@
         <p>&copy; 2025 Office MP. All rights reserved.</p>
     </div>
 </footer>
+
+<div class="sales-container">
+    <h1 class="main-title">Call Center Sales Sheet</h1>
+        
+    <!-- Add New Entry Form -->
+    <div class="entry-form">
+        <h2>Add Sales Entry</h2>
+        <div class="form-group">
+            <label for="agentName">Agent Name:</label>
+            <input type="text" id="agentName" class="form-control" placeholder="Enter agent name">
+        </div>
+        <div class="form-group">
+            <label for="salesDate">Date:</label>
+            <input type="date" id="salesDate" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="salesCount">Sales Count:</label>
+            <input type="number" id="salesCount" class="form-control" min="0" value="0">
+        </div>
+        <div class="form-group">
+            <label for="remarks">Remarks:</label>
+            <textarea id="remarks" class="form-control" placeholder="Any additional notes"></textarea>
+        </div>
+        <button id="addEntry" class="btn btn-primary">Add Entry</button>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="sales-table-container">
+        <h2>Sales Records</h2>
+        <div class="table-filters">
+            <input type="text" id="searchAgent" class="form-control" placeholder="Search by agent name">
+            <input type="date" id="filterDate" class="form-control">
+            <button id="clearFilters" class="btn">Clear Filters</button>
+        </div>
+        <table class="sales-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Agent Name</th>
+                    <th>Sales Count</th>
+                    <th>Remarks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="salesTableBody">
+                <!-- Sales entries will be added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+        <h2>Today's Summary</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <label>Total Sales Today:</label>
+                <span id="todayTotal">0</span>
+            </div>
+            <div class="summary-item">
+                <label>Top Agent Today:</label>
+                <span id="topAgent">-</span>
+            </div>
+            <div class="summary-item">
+                <label>Active Agents Today:</label>
+                <span id="activeAgents">0</span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="script.js"></script>
 </body>
