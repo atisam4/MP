@@ -384,6 +384,24 @@
         .indicator-below {
             background-color: #e74c3c;
         }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ef9a9a;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #a5d6a7;
+        }
     </style>
 </head>
 <body>
@@ -432,6 +450,7 @@
     </div>
 
     <div class="ms-content">
+        <div id="messageArea"></div>
         <div class="sales-summary">
             <div class="summary-card">
                 <h3>Total Sales</h3>
@@ -509,8 +528,19 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost/MP/backend/submit.php';
-        let currentStatsView = 'daily';
+        const API_URL = '/MP/backend/submit.php';
+
+        function showMessage(message, isError = false) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `
+                <div class="${isError ? 'error-message' : 'success-message'}">
+                    ${message}
+                </div>
+            `;
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 5000);
+        }
 
         async function submitSales() {
             const agent = document.getElementById('agentSelect').value;
@@ -519,7 +549,7 @@
             const status = document.getElementById('approvalStatus').value;
 
             if (!agent || !date || !amount || !status) {
-                alert('Please fill all fields');
+                showMessage('Please fill all fields', true);
                 return;
             }
 
@@ -539,26 +569,32 @@
 
                 const result = await response.json();
                 if (result.status === 'success') {
-                    alert('Sales data submitted successfully');
+                    showMessage('Sales data submitted successfully');
                     loadSalesData();
-                    loadAgentStats(); // Reload agent stats after submission
+                    loadAgentStats();
                     // Clear form
                     document.getElementById('agentSelect').value = '';
                     document.getElementById('salesDate').value = '';
                     document.getElementById('salesAmount').value = '';
                     document.getElementById('approvalStatus').value = '';
                 } else {
-                    alert('Error submitting sales data');
+                    showMessage(`Error: ${result.message}`, true);
+                    if (result.error_details) {
+                        console.error('Error details:', result.error_details);
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error submitting sales data');
+                showMessage(`Network error: ${error.message}`, true);
             }
         }
 
         async function loadSalesData() {
             try {
                 const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const result = await response.json();
                 if (result.status === 'success') {
                     const tbody = document.querySelector('.ms-sheet tbody');
@@ -588,9 +624,12 @@
                     // Update summary
                     document.getElementById('totalSales').textContent = `₹${totalSales.toFixed(2)}`;
                     document.getElementById('totalLaptops').textContent = totalLaptops;
+                } else {
+                    showMessage(`Error loading data: ${result.message}`, true);
                 }
             } catch (error) {
                 console.error('Error:', error);
+                showMessage(`Error loading data: ${error.message}`, true);
             }
         }
 
